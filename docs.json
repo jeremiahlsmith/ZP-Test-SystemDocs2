@@ -1,9 +1,9 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mintlify Starter Kit",
+  "theme": "willow",
+  "name": "Zotec Partners",
   "colors": {
-    "primary": "#16A34A",
+    "primary": "#8DC532",
     "light": "#07C983",
     "dark": "#15803D"
   },
@@ -34,8 +34,8 @@
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/images/image.png",
+    "dark": "/images/image.png"
   },
   "navbar": {
     "links": [
