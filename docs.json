@@ -58,11 +58,14 @@
           {
             "group": "System",
             "pages": [
-              "system/architecture",
-              "system/api-reference"
+              "system/architecture"
             ]
           }
         ]
+      },
+      {
+        "tab": "API reference",
+        "openapi": "openapi.yaml"
       }
     ]
   },
