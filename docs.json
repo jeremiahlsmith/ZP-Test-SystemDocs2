@@ -60,12 +60,12 @@
             "pages": [
               "system/architecture"
             ]
+          },
+          {
+            "group": "API reference",
+            "openapi": "openapi.yaml"
           }
         ]
-      },
-      {
-        "tab": "API reference",
-        "openapi": "openapi.yaml"
       }
     ]
   },
