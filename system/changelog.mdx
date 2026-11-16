@@ -1,0 +1,55 @@
+---
+title: "Changelog"
+sidebarTitle: "Changelog"
+description: "Release history for the Insurance Billing platform and API."
+rss: true
+filterTagMatch: "any"
+---
+
+Release notes for the Insurance Billing web application and the public API. Dates are release dates in US Eastern time.
+
+<Update label="November 2026" tags={["Web app","API"]} description="Release 2026.11">
+  ## Added
+
+  - **AI account classification** (beta): classifies patient billing accounts from FHIR communication notes. Enable it in **Settings > Features**.
+  - `GET /denials` now accepts a `reasonCode` filter.
+
+  ## Changed
+
+  - Claim scrubbing runs before submission by default. Claims that fail scrubbing are held in **Drafts** with the error listed.
+
+  ## Fixed
+
+  - Remittance files with multiple `CLP` segments for the same claim now post every payment line.
+</Update>
+
+<Update label="October 2026" tags={["Web app","API"]} description="Release 2026.10">
+  ## Added
+
+  - Scheduled reports can be delivered as PDF in addition to CSV.
+  - `POST /eligibility/checks` returns `deductibleRemaining` for in-network benefits.
+
+  ## Changed
+
+  - API rate limit for sandbox keys increased to 200 requests per minute.
+
+  ## Deprecated
+
+  - The `patientAccountNumber` field on `POST /claims` is deprecated. Use `patientId` instead. It will be removed in v2.
+
+  ## Fixed
+
+  - Denial queue no longer shows duplicate entries when a payer sends the same `CO-197` reason twice in one 835 file.
+</Update>
+
+<Update label="September 2026" tags={["Web app","API"]} description="Release 2026.09">
+  ## Added
+
+  - Initial release of the Insurance Billing web application, including claim submission, eligibility verification, denial management, and reporting.
+  - Public API v1 with endpoints for claims, eligibility, remittances, and denials.
+  - Sandbox environment with synthetic patients and test payers.
+</Update>
+
+## Versioning
+
+The API uses a version number in the URL path (`/v1`). Breaking changes ship only in a new major version. Additive changes, such as new fields or endpoints, ship in the current version and are listed under **Added**.
