@@ -1,0 +1,396 @@
+openapi: 3.0.3
+info:
+  title: Insurance Billing API
+  version: 1.0.0
+  description: REST API for creating claims, checking eligibility, retrieving remittances, and listing denials.
+servers:
+  - url: https://api.example-billing.com/v1
+    description: Production
+security:
+  - bearerAuth: []
+paths:
+  /claims:
+    post:
+      summary: Create a claim
+      operationId: createClaim
+      tags: [Claims]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimCreateRequest'
+            example:
+              patientId: pat_10482
+              payerId: payer_bcbs_il
+              encounterDate: '2026-11-02'
+              renderingProviderNpi: '1234567893'
+              diagnosisCodes: [J06.9]
+              lines:
+                - cptCode: '99213'
+                  units: 1
+                  chargeAmount: 125.00
+      responses:
+        '201':
+          description: Claim created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /claims/{claimId}:
+    get:
+      summary: Retrieve a claim
+      operationId: getClaim
+      tags: [Claims]
+      parameters:
+        - $ref: '#/components/parameters/ClaimId'
+      responses:
+        '200':
+          description: Claim found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /claims/{claimId}/submit:
+    post:
+      summary: Scrub and submit a claim to the payer
+      operationId: submitClaim
+      tags: [Claims]
+      parameters:
+        - $ref: '#/components/parameters/ClaimId'
+      responses:
+        '202':
+          description: Claim accepted for scrubbing and submission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /eligibility/checks:
+    post:
+      summary: Verify patient coverage and benefits
+      operationId: createEligibilityCheck
+      tags: [Eligibility]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EligibilityCheckRequest'
+            example:
+              patientId: pat_10482
+              payerId: payer_bcbs_il
+              serviceDate: '2026-11-16'
+      responses:
+        '200':
+          description: Eligibility result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EligibilityCheck'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /remittances/{remittanceId}:
+    get:
+      summary: Retrieve a parsed 835 remittance
+      operationId: getRemittance
+      tags: [Remittances]
+      parameters:
+        - name: remittanceId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: rem_5a17e3
+      responses:
+        '200':
+          description: Remittance found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Remittance'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /denials:
+    get:
+      summary: List open denials
+      operationId: listDenials
+      tags: [Denials]
+      parameters:
+        - name: payerId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: reasonCode
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Open denials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  denials:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Denial'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/ServerError'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key sent as a Bearer token. Sandbox keys work only against the sandbox environment.
+  parameters:
+    ClaimId:
+      name: claimId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: clm_8f21a9
+  schemas:
+    ClaimLine:
+      type: object
+      required: [cptCode, units, chargeAmount]
+      properties:
+        cptCode:
+          type: string
+          example: '99213'
+        units:
+          type: integer
+          minimum: 1
+          example: 1
+        chargeAmount:
+          type: number
+          format: float
+          example: 125.00
+    ClaimCreateRequest:
+      type: object
+      required: [patientId, payerId, encounterDate, renderingProviderNpi, diagnosisCodes, lines]
+      properties:
+        patientId:
+          type: string
+          example: pat_10482
+        payerId:
+          type: string
+          example: payer_bcbs_il
+        encounterDate:
+          type: string
+          format: date
+          example: '2026-11-02'
+        renderingProviderNpi:
+          type: string
+          description: 10-digit National Provider Identifier.
+          example: '1234567893'
+        diagnosisCodes:
+          type: array
+          items:
+            type: string
+          example: [J06.9]
+        lines:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ClaimLine'
+    Claim:
+      type: object
+      properties:
+        claimId:
+          type: string
+          example: clm_8f21a9
+        status:
+          type: string
+          enum: [draft, submitted, accepted, rejected, paid, denied]
+          example: draft
+        totalCharge:
+          type: number
+          format: float
+          example: 125.00
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-11-02T14:22:08Z'
+    EligibilityCheckRequest:
+      type: object
+      required: [patientId, payerId, serviceDate]
+      properties:
+        patientId:
+          type: string
+          example: pat_10482
+        payerId:
+          type: string
+          example: payer_bcbs_il
+        serviceDate:
+          type: string
+          format: date
+          example: '2026-11-16'
+    EligibilityCheck:
+      type: object
+      properties:
+        checkId:
+          type: string
+          example: elg_44c0d2
+        coverageActive:
+          type: boolean
+          example: true
+        copay:
+          type: number
+          format: float
+          example: 25.00
+        deductibleRemaining:
+          type: number
+          format: float
+          example: 380.00
+        checkedAt:
+          type: string
+          format: date-time
+          example: '2026-11-16T15:01:44Z'
+    Remittance:
+      type: object
+      properties:
+        remittanceId:
+          type: string
+          example: rem_5a17e3
+        payerId:
+          type: string
+          example: payer_bcbs_il
+        totalPaid:
+          type: number
+          format: float
+          example: 98.40
+        payments:
+          type: array
+          items:
+            type: object
+            properties:
+              claimId:
+                type: string
+                example: clm_8f21a9
+              paidAmount:
+                type: number
+                format: float
+                example: 98.40
+              adjustmentCodes:
+                type: array
+                items:
+                  type: string
+                example: [CO-45]
+    Denial:
+      type: object
+      properties:
+        denialId:
+          type: string
+          example: den_07b3c1
+        claimId:
+          type: string
+          example: clm_8f21a9
+        payerId:
+          type: string
+          example: payer_bcbs_il
+        reasonCode:
+          type: string
+          example: CO-197
+        deniedAmount:
+          type: number
+          format: float
+          example: 125.00
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: claim_validation_failed
+        message:
+          type: string
+          example: Diagnosis code J06.9 is not valid for CPT 99213 with this payer.
+  responses:
+    BadRequest:
+      description: Request is malformed or fails validation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: API key is missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Resource is in a state that does not allow the action
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Rate limit exceeded. Retry after the Retry-After interval.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServerError:
+      description: Server error. Retry with exponential backoff.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

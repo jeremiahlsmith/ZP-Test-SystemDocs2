@@ -58,7 +58,8 @@
           {
             "group": "System",
             "pages": [
-              "system/architecture"
+              "system/architecture",
+              "system/api-reference"
             ]
           }
         ]
