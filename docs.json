@@ -46,7 +46,8 @@
               "insurance-billing/eligibility-verification",
               "insurance-billing/claim-submission",
               "insurance-billing/denial-management",
-              "insurance-billing/reporting"
+              "insurance-billing/reporting",
+              "insurance-billing/ai-account-classification"
             ]
           }
         ]

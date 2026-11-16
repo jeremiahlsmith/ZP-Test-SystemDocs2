@@ -1,0 +1,106 @@
+---
+title: "AI account classification"
+description: "Classify patient billing accounts from FHIR communication notes with OpenAI GPT-4."
+---
+
+AI account classification reads the communication notes on a patient billing account and sorts the account into a follow-up category. It also writes a one to two sentence summary of the billing situation. The tool sends only the note text to OpenAI GPT-4, which keeps prompts small and costs low.
+
+## Prerequisites
+
+- Python 3.12 or later
+- [mise](https://mise.jdx.dev) to install the pinned version of `uv`
+- An OpenAI API key
+
+## Set up the project
+
+<Steps>
+  <Step title="Install the tool versions">
+    In the project root, run:
+
+    ```bash
+    mise install
+    ```
+  </Step>
+  <Step title="Install dependencies">
+    ```bash
+    uv sync
+    ```
+  </Step>
+  <Step title="Configure environment variables">
+    Create a `.env` file in the project root:
+
+    ```bash .env
+    OPENAI_API_KEY=your-openai-api-key
+    CLASSIFY_ACCOUNT_BATCH_SIZE=3
+    ```
+  </Step>
+</Steps>
+
+### Environment variables
+
+| Variable | Required | Default | Description |
+| --- | --- | --- | --- |
+| `OPENAI_API_KEY` | Yes | None | API key used to call OpenAI |
+| `CLASSIFY_ACCOUNT_BATCH_SIZE` | No | `3` | Number of accounts classified in parallel in each batch |
+
+## Run the classifier
+
+From the project root, run:
+
+```bash
+uv run python src/main.py
+```
+
+The classifier loads every bundle in `src/fake_fhir_bundles.json` and processes them in batches of `CLASSIFY_ACCOUNT_BATCH_SIZE`. It prints one result per bundle:
+
+```text
+--- Bundle 1 ---
+Category: payer_pending_response
+Summary: The patient asked about their bill, and the insurance claim is still pending a payer response.
+```
+
+If a bundle fails, the classifier prints `Error:` followed by the error message and continues with the remaining bundles.
+
+## Categories
+
+| Category | Meaning |
+| --- | --- |
+| `awaiting_guarantor` | The account is waiting on the guarantor, for example after an unanswered statement |
+| `payer_pending_response` | The account is waiting on a response from the insurance payer |
+| `likely_writeoff` | The balance is unlikely to be collected |
+| `needs_manual_review` | The notes don't clearly fit another category |
+
+The model uses `needs_manual_review` when it's unsure. The classifier also returns `needs_manual_review` with the summary `No summary available` when it can't parse the model's response as JSON.
+
+## Input format
+
+Each account is a FHIR `Bundle` of type `collection`. The classifier reads only entries whose `resourceType` is `Communication`, takes the note from `text.div`, and strips the HTML tags. It ignores all other resource types.
+
+```json
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Communication",
+        "id": "comm1",
+        "text": {
+          "status": "generated",
+          "div": "<div>Patient called to ask about bill. Explained insurance is pending.</div>"
+        }
+      }
+    }
+  ]
+}
+```
+
+To test more scenarios, add bundles to the array in `src/fake_fhir_bundles.json`.
+
+<Note>
+  The included bundles are sample data. They don't contain real patient information.
+</Note>
+
+## Customize the prompt
+
+The classification prompt is the Jinja2 template `src/prompts/classify_account.j2`. The classifier passes the combined note text to the template as the `notes` variable. Edit the template to change the instructions or the category definitions. If you add or rename categories, update the list in the template so the model returns them.
