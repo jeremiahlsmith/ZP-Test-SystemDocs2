@@ -1,0 +1,44 @@
+---
+title: "Denial management"
+description: "Triage, correct, and appeal denied claims."
+---
+
+When a payer denies a claim, Insurance Billing reads the remittance (835) file, groups the denial by reason code, and assigns it to the right team.
+
+## Denial queue
+
+Open **Denials** to see all open denials. Each row shows:
+
+- Claim ID and patient
+- Payer and denial date
+- Claim Adjustment Reason Code (CARC)
+- Amount at risk
+- Days until the appeal deadline
+
+Sort by **Amount at risk** to work the highest-value denials first.
+
+## Common reason codes
+
+| Code | Description | Suggested fix |
+| --- | --- | --- |
+| CO-16 | Missing information | Add the missing data and resubmit |
+| CO-18 | Duplicate claim | Confirm the original claim status before taking action |
+| CO-29 | Timely filing limit expired | Appeal with proof of original submission |
+| CO-50 | Not medically necessary | Attach clinical documentation and appeal |
+| CO-197 | Prior authorization missing | Obtain authorization and appeal |
+
+## Appeal a denial
+
+1. Open the denied claim.
+2. Select **Start appeal**.
+3. Choose an appeal letter template.
+4. Attach supporting documents.
+5. Select **Send appeal**.
+
+<Info>
+  Insurance Billing tracks appeal deadlines for each payer and sends a reminder 10 days before a deadline.
+</Info>
+
+## Automation rules
+
+Admins can create rules under **Settings** > **Denial rules** to route denials automatically. For example, send all CO-50 denials to the clinical review team.

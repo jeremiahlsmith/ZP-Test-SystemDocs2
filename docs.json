@@ -28,10 +28,6 @@
         "tab": "Home",
         "groups": [
           {
-            "group": "Products",
-            "pages": []
-          },
-          {
             "group": "Getting Started",
             "pages": [
               "index",
@@ -46,7 +42,11 @@
           {
             "product": "Insurance Billing",
             "pages": [
-              "untitled-page"
+              "untitled-page",
+              "insurance-billing/eligibility-verification",
+              "insurance-billing/claim-submission",
+              "insurance-billing/denial-management",
+              "insurance-billing/reporting"
             ]
           }
         ]

@@ -1,0 +1,38 @@
+---
+title: "Eligibility verification"
+description: "Check patient insurance coverage before a visit to reduce claim denials."
+---
+
+Eligibility verification confirms that a patient's insurance is active and shows their benefits before services are rendered. Most denials caused by inactive coverage can be prevented with this check.
+
+## Run a single check
+
+1. Open the patient record.
+2. Select **Insurance** > **Verify eligibility**.
+3. Choose the service type, such as **Office visit** or **Anesthesia**.
+4. Select **Run check**.
+
+Results usually return in under 10 seconds.
+
+## Batch verification
+
+Insurance Billing automatically verifies every patient on the next day's schedule at 2:00 AM local time. Review the results each morning under **Schedule** > **Eligibility queue**.
+
+| Status | Meaning | Action |
+| --- | --- | --- |
+| Active | Coverage confirmed | None |
+| Inactive | Coverage terminated or not found | Contact the patient for updated insurance |
+| Needs review | Payer returned partial data | Call the payer or rerun the check |
+| Error | Payer system unavailable | Retry later |
+
+## What the response includes
+
+- Plan name and group number
+- Copay, coinsurance, and remaining deductible
+- Out-of-pocket maximum
+- Prior authorization requirements
+- Coordination of benefits details
+
+<Tip>
+  Rerun eligibility for any patient whose last check is older than 30 days.
+</Tip>
