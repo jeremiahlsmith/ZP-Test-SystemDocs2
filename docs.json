@@ -54,9 +54,12 @@
       },
       {
         "tab": "System",
-        "menu": [
+        "groups": [
           {
-            "item": "Untitled Item"
+            "group": "System",
+            "pages": [
+              "system/architecture"
+            ]
           }
         ]
       }
