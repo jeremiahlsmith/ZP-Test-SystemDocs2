@@ -9,15 +9,6 @@
   },
   "favicon": "/favicon.svg",
   "navigation": {
-    "pages": [
-      {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart"
-        ]
-      }
-    ],
     "global": {
       "anchors": [
         {
@@ -31,7 +22,44 @@
           "icon": "newspaper"
         }
       ]
-    }
+    },
+    "tabs": [
+      {
+        "tab": "Home",
+        "groups": [
+          {
+            "group": "Products",
+            "pages": []
+          },
+          {
+            "group": "Getting Started",
+            "pages": [
+              "index",
+              "quickstart"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Products",
+        "products": [
+          {
+            "product": "Insurance Billing",
+            "pages": [
+              "untitled-page"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "System",
+        "menu": [
+          {
+            "item": "Untitled Item"
+          }
+        ]
+      }
+    ]
   },
   "logo": {
     "light": "/images/image.png",
