@@ -1,9 +1,9 @@
 ---
 title: "AI account classification"
-description: "This is an educational project. Classify patient billing accounts from FHIR communication notes with OpenAI GPT-4."
+description: "This is an educational project. Classify patient billing accounts from FHIR communication notes with an OpenAI model, GPT-4 by default."
 ---
 
-AI account classification reads the communication notes on a patient billing account and sorts the account into a follow-up category. It also writes a one to two sentence summary of the billing situation. The tool sends only the note text to OpenAI GPT-4, which keeps prompts small and costs low.
+AI account classification reads the communication notes on a patient billing account and sorts the account into a follow-up category. It also writes a one to two sentence summary of the billing situation. The tool sends only the note text to OpenAI, which keeps prompts small and costs low. It uses GPT-4 by default, and you can choose another model with `OPENAI_MODEL`.
 
 ## Prerequisites
 
@@ -31,6 +31,7 @@ AI account classification reads the communication notes on a patient billing acc
 
     ```bash .env
     OPENAI_API_KEY=your-openai-api-key
+    OPENAI_MODEL=gpt-4
     CLASSIFY_ACCOUNT_BATCH_SIZE=3
     ```
   </Step>
@@ -41,6 +42,7 @@ AI account classification reads the communication notes on a patient billing acc
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
 | `OPENAI_API_KEY` | Yes | None | API key used to call OpenAI |
+| `OPENAI_MODEL` | No | `gpt-4` | OpenAI chat model used to classify accounts |
 | `CLASSIFY_ACCOUNT_BATCH_SIZE` | No | `3` | Number of accounts classified in parallel in each batch |
 
 ## Run the classifier
